@@ -8,8 +8,8 @@ var connection = mysql.createConnection({
     port: 3306,
     user: "root",
     // password: `${keys.pswd.secret}`,
-    // password: keys.pswd.secret,
-    password: process.env.DB_PASS,
+    password: keys.pswd.secret,
+    // password: process.env.DB_PASS,
     database: "bamazon"
 });
 
