@@ -12,7 +12,6 @@ var connection = mysql.createConnection({
     password: process.env.DB_PASS,
     database: "bamazon"
 });
-console.log(process.env.DB_PASS);
 
 connection.connect(function(err) {
     if (err) throw err;
@@ -23,7 +22,7 @@ afterConnect();
 function afterConnect() {
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
-        // console.log(res);
+        console.log(res);
         connection.end();
     });
 };
