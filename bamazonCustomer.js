@@ -49,7 +49,7 @@ function promptCustomer() {
                 {
                     name: "chosenID",
                     type: "rawlist",
-                    message: "What would you like to order?",
+                    message: "\n What would you like to order? -- See descriptions above.",
                     choices: function () {
                         var userChoice = [];
 
@@ -63,7 +63,7 @@ function promptCustomer() {
                 {
                     name: "chosenQty",
                     type: "input",
-                    message: "How many do you want to order?",
+                    message: " \n How many do you want to order?",
                     validate: function () {
                         if (isNaN === false) {
                             return false;
@@ -87,13 +87,13 @@ function checkStock(id, qty) {
         // console.log(res);
         if (err) throw err;
 
-        if (qty <= res[0].stock_quantity) {
+        if (qty <= res[0].stock_quantity && qty != 0) {
             var cost = qty * res[0].price;
             const dollar = ("$" + cost + ".00");
 
             console.log(" ============================ ");
-            console.log(" You're in luck! We have a " + res[0].product_name + " in stock!");
-            console.log(" Total Cost: " + dollar);
+            console.log(" \n You're in luck! We have a " + res[0].product_name + " in stock!");
+            console.log(" Total Cost: " + dollar + "\n");
             console.log(" ============================ ");
 
             var query = connection.query(
@@ -107,12 +107,16 @@ function checkStock(id, qty) {
                     }
                 ],
                 function (err, res) {
+                    console.log("");
                     console.log("Thanks for your business!");
+                    console.log("");
                     connection.end();
                 });
         }
         else {
+            console.log(" ============================ ");
             console.log("Sorry, we only have " + res[0].stock_quantity + " in stock.");
+            console.log(" ============================ ");
             connection.end();
         };
     })
