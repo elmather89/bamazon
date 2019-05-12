@@ -89,18 +89,33 @@ function checkStock(id, qty) {
 
         if (qty <= res[0].stock_quantity) {
             var cost = qty * res[0].price;
+            const dollar = ("$" + cost + ".00");
 
             console.log(" ============================ ");
             console.log(" You're in luck! We have a " + res[0].product_name + " in stock!");
-            console.log(" Total Cost: " + cost);
+            console.log(" Total Cost: " + dollar);
             console.log(" ============================ ");
 
-            connection.query("UPDATE `products` SET `stock_quantity` = `stock_quantity` - " + qty + "WHERE `item_id` = " + id);
+            var query = connection.query(
+                "UPDATE `products` SET ? WHERE ?",
+                [
+                    {
+                        stock_quantity: res[0].stock_quantity - qty
+                    },
+                    {
+                        item_id: id
+                    }
+                ],
+                function (err, res) {
+                    console.log("Thanks for your business!");
+                    connection.end();
+                });
         }
         else {
             console.log("Sorry, we only have " + res[0].stock_quantity + " in stock.");
+            connection.end();
         };
     })
     // connection.end();
-    // list`Products`();
+    // listProducts();
 };
