@@ -18,12 +18,13 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    // listProducts();
-    promptCustomer();
+    // connection.end();
+    listProducts();
+    // promptCustomer();
 });
 
-function listProducts() {
-    connection.query("SELECT * FROM products", function (err, res) {
+var listProducts = function () {
+    connection.query("SELECT * FROM `products`", function (err, res) {
         if (err) throw err;
         // console.log(res);
 
@@ -34,56 +35,72 @@ function listProducts() {
             console.log(" ============================ ");
         };
 
-        connection.end();
+        // connection.end();
         promptCustomer();
     });
 };
 
 function promptCustomer() {
-    connection.query("SELECT * FROM products", function(err, res) {
+    connection.query("SELECT * FROM `products`", function (err, res) {
         if (err) throw err;
 
         inquirer
-        .prompt([
-            {
-                name: "chosenID",
-                type: "rawlist",
-                message: "What is the ID of the product you would like to order?",
-                choices: function() {
-                    var userChoice = [];
+            .prompt([
+                {
+                    name: "chosenID",
+                    type: "rawlist",
+                    message: "What would you like to order?",
+                    choices: function () {
+                        var userChoice = [];
 
-                    for (var i = 0; i < res.length; i++) {
-                        userChoice.push(res[i].product_name);
+                        for (var i = 0; i < res.length; i++) {
+                            userChoice.push(res[i].item_id);
+                        }
+
+                        return userChoice;
                     }
-
-                    return userChoice;
+                },
+                {
+                    name: "chosenQty",
+                    type: "input",
+                    message: "How many do you want to order?",
+                    validate: function () {
+                        if (isNaN === false) {
+                            return false;
+                        }
+                        else return true;
+                    }
                 }
-            },
-            {
-                name: "chosenQty",
-                type: "input",
-                message: "How many do you want to order?",
-                // validate: function() {
-                //     if (isNaN === false) {
-                //         return true;
-                //     }
-                //     else return false;
-                // }
-            }
-        ])
-        .then(function(chosenProduct) {
+            ])
+            .then(function (answer) {
+                var qtyOrdered = answer.chosenQty;
+                var idOrdered = answer.chosenID;
 
-                console.log("\n Validating your order............");
-                console.log("*************************************************");
-                console.log(" Item: " + chosenProduct.chosenID);
-                console.log(" Unique ID: " + chosenProduct.userChoiceID);
-                console.log(" Qty: " + chosenProduct.chosenQty);
-                console.log("*************************************************");
-                // howMany();         
-                
-                // validate input 
-                // do we have enough in stock && was a legitimate item id entered
-        });
-
+                checkStock(answer.chosenID, answer.chosenQty);
+            });
+        // connection.end();
     });
+};
+
+function checkStock(id, qty) {
+    connection.query("SELECT * FROM `products` WHERE `item_id` = " + id, function (err, res) {
+        // console.log(res);
+        if (err) throw err;
+
+        if (qty <= res[0].stock_quantity) {
+            var cost = qty * res[0].price;
+
+            console.log(" ============================ ");
+            console.log(" You're in luck! We have a " + res[0].product_name + " in stock!");
+            console.log(" Total Cost: " + cost);
+            console.log(" ============================ ");
+
+            connection.query("UPDATE `products` SET `stock_quantity` = `stock_quantity` - " + qty + "WHERE `item_id` = " + id);
+        }
+        else {
+            console.log("Sorry, we only have " + res[0].stock_quantity + " in stock.");
+        };
+    })
+    // connection.end();
+    // list`Products`();
 };
