@@ -18,7 +18,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    listProducts();
+    // listProducts();
     promptCustomer();
 });
 
@@ -35,27 +35,48 @@ function listProducts() {
         };
 
         connection.end();
+        promptCustomer();
     });
 };
 
 function promptCustomer() {
-    inquirer
+    connection.query("SELECT * FROM products", function(err, res) {
+        if (err) throw err;
+
+        inquirer
         .prompt([
             {
                 name: "chosenID",
-                type: "input",
-                message: "What is the ID of the product you would like to bid on?"
+                type: "rawlist",
+                message: "What is the ID of the product you would like to order?",
+                choices: function() {
+                    var userChoice = [];
+
+                    for (var i = 0; i < res.length; i++) {
+                        userChoice.push(res[i].product_name);
+                    }
+
+                    return userChoice;
+                }
             },
             {
                 name: "chosenQty",
                 type: "input",
-                message: "How many do you want to order?"
+                message: "How many do you want to order?",
+                // validate: function() {
+                //     if (isNaN === false) {
+                //         return true;
+                //     }
+                //     else return false;
+                // }
             }
         ])
-        .then(function (chosenProduct) {
-                console.log("\n You have placed an order for the following:");
+        .then(function(chosenProduct) {
+
+                console.log("\n Validating your order............");
                 console.log("*************************************************");
-                console.log(" ID: " + chosenProduct.chosenID);
+                console.log(" Item: " + chosenProduct.chosenID);
+                console.log(" Unique ID: " + chosenProduct.userChoiceID);
                 console.log(" Qty: " + chosenProduct.chosenQty);
                 console.log("*************************************************");
                 // howMany();         
@@ -63,4 +84,6 @@ function promptCustomer() {
                 // validate input 
                 // do we have enough in stock && was a legitimate item id entered
         });
+
+    });
 };
