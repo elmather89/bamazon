@@ -3,5 +3,4 @@
 * Place an order for the available inventory.
 * The app will make sure your order input is valid and there is enough in stock by checking against the database.
 
-![Screen Shot](<a href="https://github.com/elmather89/bamazon">Bamazon Shopping App</a>
-)
+![Screen Shot](bamazon.png)
